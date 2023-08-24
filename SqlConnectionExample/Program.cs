@@ -26,9 +26,10 @@ internal class Program {
         cmd.Parameters.AddWithValue("@ID", 10);
         var reader = cmd.ExecuteReader();
         if (!reader.HasRows) {
+            reader.Close();
             return null;
         }
-        var customers = new List<Customer>();
+        //var customers = new List<Customer>();
         reader.Read();
         var cust = new Customer();
         cust.ID = (int)reader["Id"];//reader returns data as generic objects, a cast works, but using Convert.To would work better
@@ -37,7 +38,7 @@ internal class Program {
         cust.City = (string)reader["City"];
         cust.State = (string)reader["State"];
         cust.Active = (bool)reader["Active"];
-        customers.Add(cust);
+        //customers.Add(cust);
         reader.Close();//only one reader can be open at a time, remember to close
         return cust;
     }
