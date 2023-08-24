@@ -15,11 +15,38 @@ internal class Program {
             throw new Exception("Connection didn't open");
         }
         Console.WriteLine("Success");
-        var sql = "SELECT * FROM Customers ORDER BY Name;";
+        GetCustomers();
+        GetByPK(15);
+
+        conn.Close();//open connections are resource intensive, remember to close
+    }
+    public static Customer? GetByPK(int ID) {
+        var sql = "SELECT * FROM Customers WHERE ID = @ID ORDER BY Name;";
         var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@ID", 10);
+        var reader = cmd.ExecuteReader();
+        if (!reader.HasRows) {
+            return null;
+        }
+        var customers = new List<Customer>();
+        reader.Read();
+        var cust = new Customer();
+        cust.ID = (int)reader["Id"];//reader returns data as generic objects, a cast works, but using Convert.To would work better
+        cust.Name = (string)reader["Name"];
+        cust.Sales = reader["sales"].Equals(DBNull.Value) ? null : Convert.ToDecimal(reader["Sales"]);//pulling a nullable value
+        cust.City = (string)reader["City"];
+        cust.State = (string)reader["State"];
+        cust.Active = (bool)reader["Active"];
+        customers.Add(cust);
+        reader.Close();//only one reader can be open at a time, remember to close
+        return cust;
+    }
+    public static List<Customer> GetCustomers() {
+        var sql = "SELECT * FROM Customers ORDER BY Name;";
+        var cmd = new SqlCommand(sql, conn);// conn wont recognize? need to fix later
         var reader = cmd.ExecuteReader();
         var customers = new List<Customer>();
-        while(reader.Read()) {//reader.read returns true if reader has more data to process
+        while (reader.Read()) {//reader.read returns true if reader has more data to process
             var cust = new Customer();
             cust.ID = (int)reader["Id"];//reader returns data as generic objects, a cast works, but using Convert.To would work better
             cust.Name = (string)reader["Name"];
@@ -30,6 +57,6 @@ internal class Program {
             customers.Add(cust);
         }
         reader.Close();//only one reader can be open at a time, remember to close
-        conn.Close();//open connections are resource intensive, remember to close
+        return customers;
     }
 }
