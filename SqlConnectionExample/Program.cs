@@ -16,12 +16,13 @@ internal class Program {
         Console.WriteLine("Success");
         var sql = "SELECT * FROM Customers WHERE id BETWEEN 10 AND 19;";
         var cmd = new SqlCommand(sql, conn);
-        var reader = cmd.ExecuteReader();
+        var reader = cmd.ExecuteReader();//
         while(reader.Read()) {//reader.read returns true if reader has more data to process
-            var id = (int)reader["Id"];
+            var id = (int)reader["Id"];//reader returns data as generic objects, a cast works, but using Convert.To would work better
             var name = (string)reader["Name"];
             Console.WriteLine($"{id} {name}");
         }
-        conn.Close();// open connections are resource intensive, remember to close when done.
+        reader.Close();//only one reader can be open at a time, remember to close
+        conn.Close();//open connections are resource intensive, remember to close
     }
 }
