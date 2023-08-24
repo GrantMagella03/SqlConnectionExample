@@ -15,12 +15,12 @@ internal class Program {
             throw new Exception("Connection didn't open");
         }
         Console.WriteLine("Success");
-        GetCustomers();
-        GetByPK(15);
+        GetCustomers(conn);
+        GetByPK(conn, 15);
 
         conn.Close();//open connections are resource intensive, remember to close
     }
-    public static Customer? GetByPK(int ID) {
+    public static Customer? GetByPK(SqlConnection conn, int ID) {
         var sql = "SELECT * FROM Customers WHERE ID = @ID ORDER BY Name;";
         var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@ID", 10);
@@ -41,9 +41,9 @@ internal class Program {
         reader.Close();//only one reader can be open at a time, remember to close
         return cust;
     }
-    public static List<Customer> GetCustomers() {
+    public static List<Customer> GetCustomers(SqlConnection conn) {
         var sql = "SELECT * FROM Customers ORDER BY Name;";
-        var cmd = new SqlCommand(sql, conn);// conn wont recognize? need to fix later
+        var cmd = new SqlCommand(sql, conn);
         var reader = cmd.ExecuteReader();
         var customers = new List<Customer>();
         while (reader.Read()) {//reader.read returns true if reader has more data to process
